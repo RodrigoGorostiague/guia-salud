@@ -1,6 +1,6 @@
 import { StyleSheet, View, type ViewProps } from 'react-native';
 
-import { colors, radii, shadows, spacing } from '@/theme';
+import { radii, shadows, spacing, useAppTheme } from '@/theme';
 
 type AppCardProps = ViewProps & {
   tone?: 'default' | 'muted' | 'highlight';
@@ -8,14 +8,17 @@ type AppCardProps = ViewProps & {
 };
 
 export function AppCard({ tone = 'default', elevated = false, style, ...rest }: AppCardProps) {
+  const { colors } = useAppTheme();
+
   return (
     <View
       style={[
         styles.base,
-        tone === 'default' && styles.default,
-        tone === 'muted' && styles.muted,
-        tone === 'highlight' && styles.highlight,
-        elevated && styles.elevated,
+        { borderColor: colors.border },
+        tone === 'default' && { backgroundColor: colors.surface },
+        tone === 'muted' && { backgroundColor: colors.surfaceMuted },
+        tone === 'highlight' && { backgroundColor: colors.primary, borderColor: colors.primary },
+        elevated && { ...styles.elevated, shadowColor: colors.shadow },
         style,
       ]}
       {...rest}
@@ -28,17 +31,6 @@ const styles = StyleSheet.create({
     borderRadius: radii.md,
     padding: spacing.lg,
     borderWidth: 1,
-    borderColor: colors.border,
-  },
-  default: {
-    backgroundColor: colors.surface,
-  },
-  muted: {
-    backgroundColor: colors.surfaceMuted,
-  },
-  highlight: {
-    backgroundColor: colors.primary,
-    borderColor: colors.primary,
   },
   elevated: {
     ...shadows.md,

@@ -10,7 +10,7 @@ import {
 
 import { AppText } from '@/components/base/app-text';
 import { triggerSelectionHaptics } from '@/services/haptics';
-import { colors, radii, spacing } from '@/theme';
+import { radii, spacing, useAppTheme } from '@/theme';
 
 type AppButtonProps = PressableProps & {
   label: string;
@@ -27,6 +27,8 @@ export function AppButton({
   onPress,
   ...rest
 }: AppButtonProps) {
+  const { colors } = useAppTheme();
+
   const handlePress = async (event: GestureResponderEvent) => {
     if (disabled) {
       return;
@@ -48,9 +50,13 @@ export function AppButton({
 
         return [
           styles.base,
-          variant === 'primary' && styles.primary,
-          variant === 'secondary' && styles.secondary,
-          variant === 'outline' && styles.outline,
+          variant === 'primary' && { backgroundColor: colors.primary },
+          variant === 'secondary' && { backgroundColor: colors.secondarySoft },
+          variant === 'outline' && {
+            backgroundColor: colors.surface,
+            borderWidth: 1,
+            borderColor: colors.border,
+          },
           pressed && !disabled && styles.pressed,
           disabled && styles.disabled,
           resolvedStyle,
@@ -61,7 +67,7 @@ export function AppButton({
         {icon}
         <AppText
           variant="button"
-          color={variant === 'primary' ? 'textOnPrimary' : 'textPrimary'}>
+          color={variant === 'primary' ? 'textOnPrimary' : variant === 'secondary' ? 'secondary' : 'textPrimary'}>
           {label}
         </AppText>
       </View>
@@ -76,17 +82,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.lg,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  primary: {
-    backgroundColor: colors.primary,
-  },
-  secondary: {
-    backgroundColor: colors.secondarySoft,
-  },
-  outline: {
-    backgroundColor: colors.surface,
-    borderWidth: 1,
-    borderColor: colors.border,
   },
   pressed: {
     opacity: 0.88,

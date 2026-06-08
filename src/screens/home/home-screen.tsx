@@ -3,7 +3,7 @@ import { router } from 'expo-router';
 
 import { AppButton, AppCard, AppContainer, AppHeader, AppIcon, AppText } from '@/components/base';
 import { triggerActionHaptics } from '@/services/haptics';
-import { colors, radii, shadows, spacing } from '@/theme';
+import { radii, shadows, spacing, useAppTheme } from '@/theme';
 
 const featureCards = [
   {
@@ -37,6 +37,8 @@ const featureCards = [
 ] as const;
 
 export function HomeScreen() {
+  const { colors } = useAppTheme();
+
   const handleFeaturePress = async (href: '/centers' | '/pharmacies' | null) => {
     await triggerActionHaptics();
 
@@ -51,6 +53,7 @@ export function HomeScreen() {
 
       <View style={styles.heroSection}>
         <View style={styles.badge}>
+          <View style={[StyleSheet.absoluteFill, styles.badgeBackground, { backgroundColor: colors.primarySoft }]} />
           <AppText variant="caption" color="primary">
             Salud, orientacion y apoyo
           </AppText>
@@ -74,11 +77,17 @@ export function HomeScreen() {
 
         <View style={styles.cardHighlights}>
           <View style={styles.highlightPill}>
+            <View
+              style={[StyleSheet.absoluteFill, styles.highlightPillBackground, { backgroundColor: colors.surfaceMuted }]}
+            />
             <AppText variant="caption" color="primary">
               Respuesta guiada
             </AppText>
           </View>
           <View style={styles.highlightPill}>
+            <View
+              style={[StyleSheet.absoluteFill, styles.highlightPillBackground, { backgroundColor: colors.surfaceMuted }]}
+            />
             <AppText variant="caption" color="primary">
               Recursos utiles
             </AppText>
@@ -104,7 +113,13 @@ export function HomeScreen() {
             disabled={!feature.href}
             onPress={() => handleFeaturePress(feature.href)}
             style={({ pressed }) => [pressed && feature.href && styles.pressed]}>
-            <AppCard tone="default" style={[styles.featureCard, feature.href && styles.featureCardInteractive]}>
+            <AppCard
+              tone="default"
+              style={[
+                styles.featureCard,
+                { shadowColor: colors.shadow },
+                feature.href && { borderColor: colors.primarySoft },
+              ]}>
               <AppIcon label={feature.icon} tone={feature.tone} />
               <View style={styles.featureText}>
                 <AppText variant="bodyStrong">{feature.title}</AppText>
@@ -136,7 +151,10 @@ const styles = StyleSheet.create({
     alignSelf: 'flex-start',
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.sm,
-    backgroundColor: colors.primarySoft,
+    borderRadius: radii.pill,
+    overflow: 'hidden',
+  },
+  badgeBackground: {
     borderRadius: radii.pill,
   },
   featuredCard: {
@@ -157,7 +175,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.sm,
     borderRadius: radii.pill,
-    backgroundColor: colors.surfaceMuted,
+    overflow: 'hidden',
+  },
+  highlightPillBackground: {
+    borderRadius: radii.pill,
   },
   sectionHeader: {
     gap: spacing.sm,
@@ -170,9 +191,6 @@ const styles = StyleSheet.create({
     gap: spacing.md,
     alignItems: 'flex-start',
     ...shadows.sm,
-  },
-  featureCardInteractive: {
-    borderColor: colors.primarySoft,
   },
   featureText: {
     flex: 1,

@@ -5,7 +5,7 @@ import { router } from 'expo-router';
 import { AppButton, AppCard, AppContainer, AppIcon, AppText } from '@/components/base';
 import { establishmentContent } from '@/constants/establishments';
 import { triggerActionHaptics, triggerSelectionHaptics } from '@/services/haptics';
-import { colors, radii, shadows, spacing } from '@/theme';
+import { radii, shadows, spacing, useAppTheme } from '@/theme';
 import type { EstablishmentCategory } from '@/types/establishments';
 
 type EstablishmentsScreenProps = {
@@ -13,6 +13,7 @@ type EstablishmentsScreenProps = {
 };
 
 export function EstablishmentsScreen({ category }: EstablishmentsScreenProps) {
+  const { colors } = useAppTheme();
   const content = establishmentContent[category];
   const [selectedId, setSelectedId] = useState(content.items[0]?.id ?? '');
 
@@ -55,9 +56,11 @@ export function EstablishmentsScreen({ category }: EstablishmentsScreenProps) {
           </View>
         </View>
 
-        <View accessibilityLabel={content.mapLabel} style={styles.mapPlaceholder}>
-          <View style={styles.mapGrid} />
-          <View style={styles.mapRoute} />
+        <View
+          accessibilityLabel={content.mapLabel}
+          style={[styles.mapPlaceholder, { backgroundColor: colors.surfaceMuted, borderColor: colors.border }]}>
+          <View style={[styles.mapGrid, { backgroundColor: colors.mapGrid }]} />
+          <View style={[styles.mapRoute, { backgroundColor: colors.mapRoute }]} />
 
           {content.items.map((item) => {
             const isSelected = selectedItem?.id === item.id;
@@ -70,7 +73,11 @@ export function EstablishmentsScreen({ category }: EstablishmentsScreenProps) {
                 onPress={() => handleSelect(item.id)}
                 style={[
                   styles.mapMarker,
-                  isSelected && styles.mapMarkerSelected,
+                  {
+                    backgroundColor: isSelected ? colors.primary : colors.surface,
+                    borderColor: colors.primary,
+                    shadowColor: colors.shadow,
+                  },
                   { left: item.x, top: item.y },
                 ]}>
                 <AppText variant="caption" color={isSelected ? 'textOnPrimary' : 'primary'}>
@@ -82,6 +89,13 @@ export function EstablishmentsScreen({ category }: EstablishmentsScreenProps) {
 
           {selectedItem ? (
             <View style={styles.mapInfoPill}>
+              <View
+                style={[
+                  StyleSheet.absoluteFill,
+                  styles.mapInfoBackground,
+                  { backgroundColor: colors.surface, borderColor: colors.border },
+                ]}
+              />
               <AppText variant="caption" color="textSecondary">
                 {selectedItem.name} · {selectedItem.distance}
               </AppText>
@@ -110,7 +124,12 @@ export function EstablishmentsScreen({ category }: EstablishmentsScreenProps) {
               accessibilityLabel={`Ver detalles resumidos de ${item.name}`}
               onPress={() => handleSelect(item.id)}
               style={({ pressed }) => [pressed && styles.pressed]}>
-              <AppCard style={[styles.listCard, isSelected && styles.listCardSelected]}>
+              <AppCard
+                style={[
+                  styles.listCard,
+                  { shadowColor: colors.shadow },
+                  isSelected && { borderColor: colors.primary, backgroundColor: colors.primarySoft },
+                ]}>
                 <View style={styles.listTopRow}>
                   <View style={styles.listTitleBlock}>
                     <AppText variant="bodyStrong">{item.name}</AppText>
@@ -119,6 +138,13 @@ export function EstablishmentsScreen({ category }: EstablishmentsScreenProps) {
                     </AppText>
                   </View>
                   <View style={styles.distancePill}>
+                    <View
+                      style={[
+                        StyleSheet.absoluteFill,
+                        styles.distancePillBackground,
+                        { backgroundColor: colors.surface, borderColor: colors.border },
+                      ]}
+                    />
                     <AppText variant="caption" color="primary">
                       {item.distance}
                     </AppText>
@@ -174,15 +200,12 @@ const styles = StyleSheet.create({
   mapPlaceholder: {
     height: 280,
     borderRadius: radii.lg,
-    backgroundColor: colors.surfaceMuted,
     overflow: 'hidden',
     borderWidth: 1,
-    borderColor: colors.border,
     position: 'relative',
   },
   mapGrid: {
     ...StyleSheet.absoluteFill,
-    backgroundColor: colors.surfaceMuted,
     opacity: 0.9,
   },
   mapRoute: {
@@ -192,7 +215,6 @@ const styles = StyleSheet.create({
     width: '70%',
     height: 10,
     borderRadius: radii.pill,
-    backgroundColor: colors.primarySoft,
     transform: [{ rotate: '-18deg' }],
   },
   mapMarker: {
@@ -202,13 +224,8 @@ const styles = StyleSheet.create({
     borderRadius: radii.pill,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: colors.surface,
     borderWidth: 1,
-    borderColor: colors.primary,
     ...shadows.sm,
-  },
-  mapMarkerSelected: {
-    backgroundColor: colors.primary,
   },
   mapInfoPill: {
     position: 'absolute',
@@ -218,9 +235,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.sm,
     borderRadius: radii.pill,
-    backgroundColor: colors.surface,
+    overflow: 'hidden',
+  },
+  mapInfoBackground: {
+    borderRadius: radii.pill,
     borderWidth: 1,
-    borderColor: colors.border,
   },
   sectionHeader: {
     gap: spacing.xs,
@@ -231,10 +250,6 @@ const styles = StyleSheet.create({
   listCard: {
     gap: spacing.md,
     ...shadows.sm,
-  },
-  listCardSelected: {
-    borderColor: colors.primary,
-    backgroundColor: colors.primarySoft,
   },
   listTopRow: {
     flexDirection: 'row',
@@ -249,9 +264,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.sm,
     paddingVertical: spacing.xs,
     borderRadius: radii.pill,
-    backgroundColor: colors.surface,
+    overflow: 'hidden',
+  },
+  distancePillBackground: {
+    borderRadius: radii.pill,
     borderWidth: 1,
-    borderColor: colors.border,
   },
   metaRow: {
     flexDirection: 'row',
