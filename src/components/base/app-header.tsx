@@ -7,12 +7,19 @@ import { spacing } from '@/theme';
 type AppHeaderProps = {
   title: string;
   subtitle?: string;
+  iconLabel?: string;
+  iconTone?: 'primary' | 'secondary' | 'neutral';
 };
 
-export function AppHeader({ title, subtitle }: AppHeaderProps) {
+export function AppHeader({
+  title,
+  subtitle,
+  iconLabel = 'GS',
+  iconTone = 'primary',
+}: AppHeaderProps) {
   return (
     <View style={styles.container}>
-      <AppIcon label="GS" size="lg" />
+      <AppIcon label={iconLabel} size="lg" tone={iconTone} />
       <View style={styles.textBlock}>
         <AppText variant="subheading">{title}</AppText>
         {subtitle ? (

@@ -6,4 +6,5 @@ export { spacing } from './spacing';
 export type { SpacingToken } from './spacing';
 export { fontFamilies, typography } from './typography';
 export type { TextVariant } from './typography';
-export { useAppTheme } from './use-app-theme';
+export { ThemeProvider, useAppTheme } from './theme-provider';
+export type { ThemePreference } from './theme-provider';

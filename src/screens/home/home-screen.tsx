@@ -5,14 +5,13 @@ import { AppButton, AppCard, AppContainer, AppHeader, AppIcon, AppText } from '@
 import { triggerActionHaptics } from '@/services/haptics';
 import { radii, shadows, spacing, useAppTheme } from '@/theme';
 
+const triageSignals = [
+  { label: 'Urgente', colorKey: 'error' as const },
+  { label: 'Prioritaria', colorKey: 'warning' as const },
+  { label: 'Baja urgencia', colorKey: 'success' as const },
+] as const;
+
 const featureCards = [
-  {
-    title: 'Evaluacion de sintomas',
-    description: 'Recibe orientacion inicial clara para entender mejor tu situacion.',
-    icon: 'EV',
-    tone: 'primary' as const,
-    href: null,
-  },
   {
     title: 'Centros de atencion',
     description: 'Consulta opciones de atencion medica y puntos de ayuda cercanos.',
@@ -39,7 +38,9 @@ const featureCards = [
 export function HomeScreen() {
   const { colors } = useAppTheme();
 
-  const handleFeaturePress = async (href: '/centers' | '/pharmacies' | null) => {
+  const handleFeaturePress = async (
+    href: '/centers' | '/pharmacies' | '/symptoms-assessment' | '/history' | '/step-by-step-guide' | null,
+  ) => {
     await triggerActionHaptics();
 
     if (href) {
@@ -58,49 +59,81 @@ export function HomeScreen() {
             Salud, orientacion y apoyo
           </AppText>
         </View>
-        <AppText variant="heading">Tu guia de salud estes donde estes</AppText>
+        <AppText variant="display">Tu guia de salud estes donde estes</AppText>
         <AppText variant="body" color="textSecondary">
           Orientacion sanitaria rapida y segura cuando mas la necesites.
         </AppText>
+
+        <AppCard elevated style={[styles.primaryCtaCard, { shadowColor: colors.shadow }]}> 
+          <View style={styles.triageSignalRow}>
+            {triageSignals.map((signal) => (
+              <View key={signal.label} style={styles.triageSignalItem}>
+                <View
+                  style={[
+                    styles.triageSignalDot,
+                    { backgroundColor: colors[signal.colorKey] },
+                  ]}
+                />
+                <AppText variant="label" color="textSecondary">
+                  {signal.label}
+                </AppText>
+              </View>
+            ))}
+          </View>
+
+          <View style={styles.primaryCtaTopRow}>
+            <View style={styles.primaryIconWrap}>
+              <View
+                style={[
+                  StyleSheet.absoluteFill,
+                  styles.primaryIconGlow,
+                  { backgroundColor: colors.primarySoft },
+                ]}
+              />
+              <AppIcon label="EV" size="lg" tone="secondary" />
+            </View>
+            <View style={styles.primaryCtaCopy}>
+              <AppText variant="label" color="primary">
+                FUNCION PRINCIPAL
+              </AppText>
+              <AppText variant="heading">Evaluacion de sintomas</AppText>
+              <AppText variant="body" color="textSecondary">
+                Inicia una evaluacion orientativa inspirada en triage medico y entiende rapidamente el nivel de urgencia de tu situacion.
+              </AppText>
+            </View>
+          </View>
+
+          <View style={styles.primaryCtaHighlights}>
+            <AppButton
+              label="Guia paso a paso"
+              variant="outline"
+              size="compact"
+              onPress={() => handleFeaturePress('/step-by-step-guide')}
+              style={styles.secondaryActionButton}
+            />
+            <AppButton
+              label="Historial"
+              variant="outline"
+              size="compact"
+              onPress={() => handleFeaturePress('/history')}
+              style={styles.secondaryActionButton}
+            />
+          </View>
+
+          <AppButton
+            label="Evaluar mis sintomas"
+            variant="primary"
+            size="large"
+            onPress={() => handleFeaturePress('/symptoms-assessment')}
+            style={[styles.primaryCtaButton, { shadowColor: colors.shadow }]}
+          />
+        </AppCard>
       </View>
 
-      <AppCard elevated style={styles.featuredCard}>
-        <View style={styles.featuredHeader}>
-          <AppIcon label="+" size="lg" tone="secondary" />
-          <View style={styles.featuredCopy}>
-            <AppText variant="subheading">Ayuda clara en momentos clave</AppText>
-            <AppText variant="body" color="textSecondary">
-              Una experiencia pensada para orientarte, ayudarte a decidir y acercarte a los recursos de salud correctos.
-            </AppText>
-          </View>
-        </View>
-
-        <View style={styles.cardHighlights}>
-          <View style={styles.highlightPill}>
-            <View
-              style={[StyleSheet.absoluteFill, styles.highlightPillBackground, { backgroundColor: colors.surfaceMuted }]}
-            />
-            <AppText variant="caption" color="primary">
-              Respuesta guiada
-            </AppText>
-          </View>
-          <View style={styles.highlightPill}>
-            <View
-              style={[StyleSheet.absoluteFill, styles.highlightPillBackground, { backgroundColor: colors.surfaceMuted }]}
-            />
-            <AppText variant="caption" color="primary">
-              Recursos utiles
-            </AppText>
-          </View>
-        </View>
-
-        <AppButton label="Explorar opciones" variant="primary" />
-      </AppCard>
-
       <View style={styles.sectionHeader}>
-        <AppText variant="subheading">Funciones previstas</AppText>
+        <AppText variant="subheading">Accesos complementarios</AppText>
         <AppText variant="body" color="textSecondary">
-          Una base visual para futuras herramientas sanitarias, accesibles y faciles de entender.
+          Recursos de apoyo que complementaran la evaluacion principal con orientacion contextual.
         </AppText>
       </View>
 
@@ -136,6 +169,18 @@ export function HomeScreen() {
           </Pressable>
         ))}
       </View>
+
+      <AppCard tone="muted" elevated style={[styles.disclaimerCard, { shadowColor: colors.shadow }]}> 
+        <View style={styles.disclaimerHeader}>
+          <AppIcon label="IN" tone="neutral" />
+          <View style={styles.disclaimerCopy}>
+            <AppText variant="subheading">Orientacion responsable</AppText>
+            <AppText variant="body" color="textSecondary">
+              Guia Salud te ayuda a ordenar sintomas y nivel de urgencia, pero no reemplaza la evaluacion, el diagnostico ni el tratamiento de profesionales de la salud.
+            </AppText>
+          </View>
+        </View>
+      </AppCard>
     </AppContainer>
   );
 }
@@ -157,28 +202,55 @@ const styles = StyleSheet.create({
   badgeBackground: {
     borderRadius: radii.pill,
   },
-  featuredCard: {
+  primaryCtaCard: {
     gap: spacing.lg,
+    borderRadius: radii.lg,
+    paddingTop: spacing.xl,
   },
-  featuredHeader: {
+  triageSignalRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
     gap: spacing.md,
   },
-  featuredCopy: {
+  triageSignalItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.xs,
+  },
+  triageSignalDot: {
+    width: 10,
+    height: 10,
+    borderRadius: radii.pill,
+  },
+  primaryCtaTopRow: {
+    gap: spacing.md,
+  },
+  primaryIconWrap: {
+    alignSelf: 'flex-start',
+    borderRadius: 28,
+    overflow: 'hidden',
+  },
+  primaryIconGlow: {
+    borderRadius: 28,
+    opacity: 0.75,
+  },
+  primaryCtaCopy: {
     gap: spacing.sm,
   },
-  cardHighlights: {
+  primaryCtaHighlights: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: spacing.sm,
+    alignItems: 'center',
   },
-  highlightPill: {
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
-    borderRadius: radii.pill,
-    overflow: 'hidden',
+  primaryCtaButton: {
+    minHeight: 64,
+    shadowOpacity: 0.22,
+    shadowRadius: 18,
+    shadowOffset: { width: 0, height: 10 },
   },
-  highlightPillBackground: {
-    borderRadius: radii.pill,
+  secondaryActionButton: {
+    minHeight: 44,
   },
   sectionHeader: {
     gap: spacing.sm,
@@ -195,6 +267,19 @@ const styles = StyleSheet.create({
   featureText: {
     flex: 1,
     gap: spacing.xs,
+  },
+  disclaimerCard: {
+    gap: spacing.md,
+    borderRadius: radii.lg,
+  },
+  disclaimerHeader: {
+    flexDirection: 'row',
+    gap: spacing.md,
+    alignItems: 'flex-start',
+  },
+  disclaimerCopy: {
+    flex: 1,
+    gap: spacing.sm,
   },
   pressed: {
     opacity: 0.92,

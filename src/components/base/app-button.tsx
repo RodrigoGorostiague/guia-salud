@@ -16,12 +16,14 @@ type AppButtonProps = PressableProps & {
   label: string;
   variant?: 'primary' | 'secondary' | 'outline';
   icon?: React.ReactNode;
+  size?: 'compact' | 'default' | 'large';
 };
 
 export function AppButton({
   label,
   variant = 'primary',
   icon,
+  size = 'default',
   style,
   disabled,
   onPress,
@@ -50,6 +52,8 @@ export function AppButton({
 
         return [
           styles.base,
+          size === 'compact' && styles.compact,
+          size === 'large' && styles.large,
           variant === 'primary' && { backgroundColor: colors.primary },
           variant === 'secondary' && { backgroundColor: colors.secondarySoft },
           variant === 'outline' && {
@@ -83,8 +87,17 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  compact: {
+    minHeight: 44,
+    paddingHorizontal: spacing.md,
+  },
+  large: {
+    minHeight: 62,
+    paddingHorizontal: spacing.xl,
+  },
   pressed: {
-    opacity: 0.88,
+    opacity: 0.94,
+    transform: [{ translateY: 1 }],
   },
   disabled: {
     opacity: 0.45,
