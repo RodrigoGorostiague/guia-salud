@@ -2,6 +2,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import { useColorScheme } from 'react-native';
 
+import { logStartupError, logStartupEvent } from '@/services/startup-logging';
 import { colorThemes, type AppTheme } from '@/theme/colors';
 
 export type ThemePreference = 'system' | 'light' | 'dark';
@@ -28,6 +29,10 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     let isMounted = true;
 
     async function loadThemePreference() {
+      logStartupEvent('Loading theme preference', {
+        systemScheme: systemScheme ?? 'unknown',
+      });
+
       try {
         const storedPreference = await AsyncStorage.getItem(THEME_PREFERENCE_KEY);
 
@@ -37,10 +42,16 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 
         if (storedPreference === 'light' || storedPreference === 'dark' || storedPreference === 'system') {
           setPreference(storedPreference);
+          logStartupEvent('Theme preference restored', { storedPreference });
+        } else if (storedPreference !== null) {
+          logStartupEvent('Ignoring invalid stored theme preference', { storedPreference });
         }
+      } catch (error) {
+        logStartupError('Failed to load theme preference', error);
       } finally {
         if (isMounted) {
           setIsReady(true);
+          logStartupEvent('Theme provider marked ready');
         }
       }
     }
@@ -50,11 +61,18 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     return () => {
       isMounted = false;
     };
-  }, []);
+  }, [systemScheme]);
 
   const setThemePreference = async (nextPreference: ThemePreference) => {
     setPreference(nextPreference);
-    await AsyncStorage.setItem(THEME_PREFERENCE_KEY, nextPreference);
+
+    try {
+      await AsyncStorage.setItem(THEME_PREFERENCE_KEY, nextPreference);
+      logStartupEvent('Theme preference saved', { nextPreference });
+    } catch (error) {
+      logStartupError('Failed to save theme preference', error, { nextPreference });
+      throw error;
+    }
   };
 
   const resolvedTheme: AppTheme =
