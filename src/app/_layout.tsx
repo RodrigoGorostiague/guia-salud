@@ -1,9 +1,8 @@
 import { Component, useEffect, useState, type ReactNode } from 'react';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 
-import { AppText } from '@/components/base';
 import { AppStartupLoader } from '@/components/app-startup-loader';
 import {
   installGlobalStartupErrorLogging,
@@ -27,10 +26,10 @@ class StartupErrorBoundary extends Component<{ children: ReactNode }, { hasError
     if (this.state.hasError) {
       return (
         <View style={styles.errorScreen}>
-          <AppText variant="subheading">No se pudo iniciar la aplicacion</AppText>
-          <AppText variant="body" color="textSecondary">
+          <Text style={styles.errorTitle}>No se pudo iniciar la aplicacion</Text>
+          <Text style={styles.errorBody}>
             Revisa Logcat para ver el detalle del error de arranque.
-          </AppText>
+          </Text>
         </View>
       );
     }
@@ -94,7 +93,21 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
+    backgroundColor: '#07111F',
     padding: 24,
     gap: 12,
+  },
+  errorTitle: {
+    color: '#F5F8FC',
+    fontSize: 24,
+    lineHeight: 30,
+    fontWeight: '700',
+    textAlign: 'center',
+  },
+  errorBody: {
+    color: '#9DB0C8',
+    fontSize: 16,
+    lineHeight: 24,
+    textAlign: 'center',
   },
 });

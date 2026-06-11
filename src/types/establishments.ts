@@ -1,6 +1,9 @@
-import type { DimensionValue } from 'react-native';
+export type EstablishmentCategory = 'centers' | 'pharmacies' | 'hospitals';
 
-export type EstablishmentCategory = 'centers' | 'pharmacies';
+export type EstablishmentCoordinate = {
+  latitude: number;
+  longitude: number;
+};
 
 export type Establishment = {
   id: string;
@@ -12,6 +15,5 @@ export type Establishment = {
   summary: string;
   markerLabel: string;
   rating: number;
-  x: DimensionValue;
-  y: DimensionValue;
+  coordinate: EstablishmentCoordinate;
 };
